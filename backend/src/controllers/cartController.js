@@ -1,4 +1,5 @@
 const prisma = require("../config/prisma");
+const { calculateCartTotal } = require("../utils/calculations");
 
 async function getOrCreateCart(userId) {
   let cart = await prisma.cart.findUnique({ where: { userId } });
@@ -7,8 +8,7 @@ async function getOrCreateCart(userId) {
 }
 
 function withTotal(cart) {
-  const total = cart.items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-  return { ...cart, total };
+  return { ...cart, total: calculateCartTotal(cart.items) };
 }
 
 exports.getCart = async (req, res) => {

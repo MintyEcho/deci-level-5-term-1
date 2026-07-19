@@ -1,5 +1,6 @@
 const prisma = require("../config/prisma");
 const { logActivity } = require("../services/activityLogService");
+const { buildPaginationMeta } = require("../utils/calculations");
 
 // GET /api/products?search=&categoryId=&sort=price_asc|price_desc|name_asc|name_desc&page=1&limit=20
 exports.getAll = async (req, res) => {
@@ -38,7 +39,7 @@ exports.getAll = async (req, res) => {
 
   res.json({
     data: products,
-    pagination: { page: Number(page), limit: take, total, pages: Math.ceil(total / take) },
+    pagination: buildPaginationMeta({ page, limit: take, total }),
   });
 };
 
