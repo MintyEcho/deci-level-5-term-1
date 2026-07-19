@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
+  engineType = "binary"
 }
 
 datasource db {
@@ -14,6 +15,7 @@ model User {
   name      String?
   role      String   @default("customer")
   orders    Order[]
+  cart      Cart?
   createdAt DateTime @default(now())
 }
 
@@ -24,14 +26,42 @@ model Category {
 }
 
 model Product {
-  id         Int         @id @default(autoincrement())
-  name       String
-  price      Float
-  stock      Int         @default(0)
-  categoryId Int
-  category   Category    @relation(fields: [categoryId], references: [id])
-  orderItems OrderItem[]
-  createdAt  DateTime    @default(now())
+  id          Int            @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  stock       Int            @default(0)
+  categoryId  Int
+  category    Category       @relation(fields: [categoryId], references: [id])
+  images      ProductImage[]
+  orderItems  OrderItem[]
+  cartItems   CartItem[]
+  createdAt   DateTime       @default(now())
+}
+
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  url       String
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Cart {
+  id     Int        @id @default(autoincrement())
+  userId Int        @unique
+  user   User       @relation(fields: [userId], references: [id])
+  items  CartItem[]
+}
+
+model CartItem {
+  id        Int     @id @default(autoincrement())
+  cartId    Int
+  cart      Cart    @relation(fields: [cartId], references: [id])
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int     @default(1)
+
+  @@unique([cartId, productId])
 }
 
 model Order {
